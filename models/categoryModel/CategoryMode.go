@@ -55,3 +55,20 @@ func Detail(id int) entities.Category {
 
 	return category
 }
+
+func Update(id int, category entities.Category) bool {
+	query, err := config.DB.Exec("UPDATE categories SET name = ?, updated_at = ? WHERE id = ?", category.Name, category.UpdatedAt, id)
+	if err != nil {
+		panic(err)
+	}
+	result, err := query.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+	return result > 0
+}
+
+func Delete(id int) error {
+	_, err := config.DB.Exec("DELETE FROM categories WHERE id = ?", id)
+	return err
+}

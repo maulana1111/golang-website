@@ -64,7 +64,37 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 
 		temp.Execute(w, data)
 	}
+
+	if r.Method == "POST" {
+		var category entities.Category
+		var idString = r.FormValue("id")
+		id, err := strconv.Atoi(idString)
+		if err != nil {
+			panic(err)
+		}
+
+		category.Name = r.FormValue("name")
+		category.UpdatedAt = time.Now()
+
+		if ok := categoryModel.Update(id, category); !ok {
+			http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
+		}
+
+		http.Redirect(w, r, "/categories", http.StatusSeeOther)
+
+	}
 }
 func Delete(w http.ResponseWriter, r *http.Request) {
+	idString := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := categoryModel.Delete(id); err != nil {
+		panic(err)
+	}
+
+	http.Redirect(w, r, "/categories", http.StatusSeeOther)
 
 }
